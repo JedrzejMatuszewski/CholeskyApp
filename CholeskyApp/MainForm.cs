@@ -24,7 +24,7 @@ namespace CholeskyApp
 
             var ltt = new LTTHelper(size);
 
-            this.resultsList.Items.Add($"N: {size} Time: {ltt.GenerationTime}ms");
+            this.resultsList.Items.Add($"N: {size} Time: {ltt.GenerationTime} ns");
         }
 
     }

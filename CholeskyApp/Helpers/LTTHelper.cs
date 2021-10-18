@@ -7,7 +7,7 @@ namespace CholeskyApp.Helpers
     {
         public double[,] MatrixA { get; private set; }
         public double[,] MatrixL { get; private set; }
-        public long GenerationTime { get; private set; }
+        public double GenerationTime { get; private set; }
 
         private int _matrixSize { get; set; }
 
@@ -32,7 +32,10 @@ namespace CholeskyApp.Helpers
                 {
                     sum = 0.0;
                     for (int j = 0; j < s; j++)
+                    {
                         sum += matrixL[i, j] * matrixL[s, j];
+                    }
+                        
 
                     matrixL[i, s] = MatrixA[i, s] - sum;
 
@@ -42,9 +45,10 @@ namespace CholeskyApp.Helpers
                         matrixL[i, s] = matrixL[i, s] / matrixL[s, s];
                 }
             }
-            stopWatch.Stop();
+           stopWatch.Stop();
 
-            GenerationTime = stopWatch.ElapsedMilliseconds;
+            //GenerationTime = stopWatch.ElapsedMilliseconds;
+            GenerationTime = ( (double)stopWatch.ElapsedTicks / Stopwatch.Frequency) *1000000000;
             MatrixL = matrixL;
         }
 

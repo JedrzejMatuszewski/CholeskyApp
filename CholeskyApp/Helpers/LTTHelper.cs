@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CholeskyApp.Model;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace CholeskyApp.Helpers
@@ -11,8 +13,12 @@ namespace CholeskyApp.Helpers
 
         private int _matrixSize { get; set; }
 
+
+        public List<ElementP> ListaPomocnicza { get; set; }
+
         public LTTHelper(int matrixSize)
         {
+            ListaPomocnicza = new List<ElementP>();
             _matrixSize = matrixSize;
             MatrixA = GeneratePascalMatrix(_matrixSize);
             CreateMatrixL();
@@ -21,31 +27,81 @@ namespace CholeskyApp.Helpers
 
         private void CreateMatrixL()
         {
+            var _matrixA = (double[,])MatrixA.Clone();
             var matrixL = new double[_matrixSize, _matrixSize];
+
             var stopWatch = new Stopwatch();
-            double sum;
 
             stopWatch.Start();
-            for (int s = 0; s < _matrixSize; s++)
+
+            var nrOperacji = 0;
+
+
+            for (int i = 0; i < _matrixSize; i++)
             {
-                for (int i = s; i < _matrixSize; i++)
-                {
-                    sum = 0.0;
-                    for (int j = 0; j < s; j++)
+                _matrixA[i, i] = Math.Sqrt(_matrixA[i, i]);
+                //
+                ++nrOperacji;
+                ListaPomocnicza.Add(
+                    new ElementP
                     {
-                        sum += matrixL[i, j] * matrixL[s, j];
+                        Id = nrOperacji,
+                        W_I = i,
+                        M1 = $"{i} {i}",
+                        RodzajOperacji = RodzajOperacji.Sqrt
                     }
-                        
+                );
 
-                    matrixL[i, s] = MatrixA[i, s] - sum;
+                for (int j = i + 1; j < _matrixSize; j++)
+                {
+                    _matrixA[j, i] = _matrixA[j, i] / _matrixA[i, i];
+                    //
+                    ++nrOperacji;
+                    ListaPomocnicza.Add(
+                        new ElementP
+                        {
+                            Id = nrOperacji,
+                            W_I = i,
+                            W_J = j,
+                            M1 = $"{i} {i}",
+                            M2 = $"{j} {i}",
+                            RodzajOperacji = RodzajOperacji.Div
+                        }
+                    );
 
-                    if (s == i)
-                        matrixL[i, s] = Math.Sqrt((matrixL[i, s]));
-                    else
-                        matrixL[i, s] = matrixL[i, s] / matrixL[s, s];
                 }
+
+                for (int j = i + 1; j < _matrixSize; j++)
+                {
+                    for (int k = i + 1; k <= j; k++)
+                    {
+                        _matrixA[j, k] = _matrixA[j, k] - _matrixA[j, i] * _matrixA[k, i];
+                        //
+                        ++nrOperacji;
+                        ListaPomocnicza.Add(
+                            new ElementP
+                            {
+                                Id = nrOperacji,
+                                W_I = i,
+                                W_J = j,
+                                W_K = k,
+                                M3 = $"{j} {i}",
+                                M4 = $"{k} {i}",
+                                M5 = $"{j} {k}",
+                                RodzajOperacji = RodzajOperacji.MulAndSub                               
+                            }
+                        );
+                    }
+                }
+
             }
-           stopWatch.Stop();
+
+            for (int i = 0; i < _matrixSize; i++)
+                for (int j = 0; j < _matrixSize; j++)
+                    if (i >= j)
+                        matrixL[i, j] = _matrixA[i, j];
+
+            stopWatch.Stop();
 
             //GenerationTime = stopWatch.ElapsedMilliseconds;
             GenerationTime = ( (double)stopWatch.ElapsedTicks / Stopwatch.Frequency) *1000000000;

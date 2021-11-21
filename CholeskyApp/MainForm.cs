@@ -18,29 +18,42 @@ namespace CholeskyApp
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void topMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            var size = (int)this.matrixSizeNumericInput.Value;
-
-            var ltt = new LTTHelper(size);
-
-            this.resultsList.Items.Add($"N: {size} Time: {ltt.GenerationTime} ns");
-
-            this.dataGridView1.Rows.Clear();
-            ltt.ListaPomocnicza = ltt.ListaPomocnicza.OrderBy(x => x.W_I).ThenBy(y => y.W_J).ThenBy(z => z.W_K).ToList();
-
-            foreach (var item in ltt.ListaPomocnicza)
+            string itemText = e.ClickedItem.Text;
+            switch (itemText)
             {
-                this.dataGridView1.Rows.Add(
+                case "Home":
+                    hideControls();
+                    showHomePage();
+                    break;
 
-                    $"{item.Id}", $"{item.RodzajOperacji}", $"{item.W_I}", $"{item.W_J}", $"{item.W_K}", $"{item.M1}", $"{item.M2}", $"{item.M3}", $"{item.M4}", $"{item.M5}"
-
-
-
-                    );
+                case "Tab2":
+                    hideControls();
+                    showTab2();
+                    break;
+                default:
+                    break;
             }
+        }
+
+        private void hideControls()
+        {
+            mainControl1.Hide();
+            pageTwoControl1.Hide();
 
         }
 
+        private void showTab2()
+        {
+            pageTwoControl1.Show();
+            pageTwoControl1.BringToFront();
+        }
+
+        private void showHomePage()
+        {
+            mainControl1.Show();
+            mainControl1.BringToFront();
+        }
     }
 }

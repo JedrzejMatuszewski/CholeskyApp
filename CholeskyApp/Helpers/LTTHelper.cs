@@ -46,8 +46,10 @@ namespace CholeskyApp.Helpers
                     new ElementP
                     {
                         Id = nrOperacji,
-                        W_I = i,
-                        M1 = $"{i} {i}",
+                        W_I = i+1,
+                        W_J = i+1,//Nie mamy ich, wiec wpisujemy index zewn. petli
+                        W_K = i+1,//
+                        M1 = $"{i+1} {i+1}",
                         RodzajOperacji = RodzajOperacji.Sqrt
                     }
                 );
@@ -61,10 +63,11 @@ namespace CholeskyApp.Helpers
                         new ElementP
                         {
                             Id = nrOperacji,
-                            W_I = i,
-                            W_J = j,
-                            M1 = $"{i} {i}",
-                            M2 = $"{j} {i}",
+                            W_I = i+1,
+                            W_J = j+1,
+                            W_K = i+1, //Nie mamy ich, wiec wpisujemy index zewn. petli
+                            M1 = $"{i+1} {i+1}",
+                            M2 = $"{j+1} {i+1}",
                             RodzajOperacji = RodzajOperacji.Div
                         }
                     );
@@ -82,12 +85,12 @@ namespace CholeskyApp.Helpers
                             new ElementP
                             {
                                 Id = nrOperacji,
-                                W_I = i,
-                                W_J = j,
-                                W_K = k,
-                                M3 = $"{j} {i}",
-                                M4 = $"{k} {i}",
-                                M5 = $"{j} {k}",
+                                W_I = i+1,
+                                W_J = j+1,
+                                W_K = k+1,
+                                M3 = $"{j+1} {i+1}",
+                                M4 = $"{k+1} {i+1}",
+                                M5 = $"{j+1} {k+1}",
                                 RodzajOperacji = RodzajOperacji.MulAndSub                               
                             }
                         );

@@ -180,14 +180,80 @@ namespace CholeskyApp.Controls
             }
 
 
+            //M5 --> M2 24-27
+            forCounter = 1;
+            foreach (var item in lista)
+            {
+                if (item.M5 == null)
+                {
+                    ++forCounter;
+                    continue;
+                }
+
+                var next = lista.Skip(forCounter).FirstOrDefault(x => x.M2 == item.M5 && (x.W_I-item.W_I==1));
+                if (next != null)
+                {
+                    listaLukow.Add(
+                        new Luk
+                        {
+                            Id = lokId,
+                            Od = $"{item.W_I} {item.W_J} {item.W_K}",
+                            Do = $"{next.W_I} {next.W_J} {next.W_K}"
+                        }
+                    );
+                    ++lokId;
+                }
+                ++forCounter;
+            }
+
+
+            //M5 --> M1 27-30
+            forCounter = 1;
+            foreach (var item in lista)
+            {
+                if (item.M5 == null)
+                {
+                    ++forCounter;
+                    continue;
+                }
+
+                var next = lista.Skip(forCounter).FirstOrDefault(x => x.M1 == item.M5 && (x.W_I - item.W_I == 1));
+                if (next != null)
+                {
+                    listaLukow.Add(
+                        new Luk
+                        {
+                            Id = lokId,
+                            Od = $"{item.W_I} {item.W_J} {item.W_K}",
+                            Do = $"{next.W_I} {next.W_J} {next.W_K}"
+                        }
+                    );
+                    ++lokId;
+                }
+                ++forCounter;
+            }
+
+
 
             var result = listaLukow.ToList();
 
             PopupForm popup = new PopupForm();
             popup.ListaLukow = listaLukow.ToList();
             popup.LoadData();
-            popup.ShowDialog();
+            popup.Show();
 
+            var listaWezlow = lista.Select(x =>
+                new Wezel
+                {
+                    Id = x.Id,
+                    Vector = $"{x.W_I} {x.W_J} {x.W_K}"
+                }
+            ).ToList();
+
+            var popup2 = new PopupWezly();
+            popup2.ListaWezlow = listaWezlow;
+            popup2.LoadData();
+            popup2.Show();
 
         }
 

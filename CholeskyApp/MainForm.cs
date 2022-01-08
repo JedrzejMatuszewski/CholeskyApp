@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,44 +17,32 @@ namespace CholeskyApp
         public MainForm()
         {
             InitializeComponent();
-        }
+            pageTwoControl1.lblFs1.Text = "{1, 0, 1}";
+            pageTwoControl1.lblFs2.Text = "{0, 1, 0}";
 
-        private void topMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            string itemText = e.ClickedItem.Text;
-            switch (itemText)
-            {
-                case "Home":
-                    hideControls();
-                    showHomePage();
-                    break;
+            pageTwoControl2.lblFs1.Text = "{-1, 0, -1}";
+            pageTwoControl2.lblFs2.Text = "{1, 0, -1}";
 
-                case "Tab2":
-                    hideControls();
-                    showTab2();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void hideControls()
-        {
-            mainControl1.Hide();
-            pageTwoControl1.Hide();
+            pageTwoControl3.lblFs1.Text = "{0, 0, 1}";
+            pageTwoControl3.lblFs2.Text = " ";
 
         }
 
-        private void showTab2()
+        private void pageTwoControl1_Click(object sender, EventArgs e)
         {
-            pageTwoControl1.Show();
-            pageTwoControl1.BringToFront();
-        }
+            this.pageTwoControl1.ltt = this.mainControl1.ltt;
+            mainControl1.CreateTactNumber(new Vector3(1, 0, 1), new Vector3(0, 1, 0));
+            pageTwoControl1.LoadData(new Vector3(1, 0, 1), new Vector3(0, 1, 0), mainControl1.lista, 2*mainControl1.size+2);
 
-        private void showHomePage()
-        {
-            mainControl1.Show();
-            mainControl1.BringToFront();
+            mainControl1.CreateTactNumber(new Vector3(-1, 0, -1), new Vector3(1, 0, -1));
+            this.pageTwoControl2.ltt = this.mainControl1.ltt;
+            pageTwoControl2.LoadData(new Vector3(-1, 0, -1), new Vector3(1, 0, -1), mainControl1.lista, 2*mainControl1.size-1);
+
+            mainControl1.CreateTactNumber(new Vector3(0, 0, 1), new Vector3(0, 0, 0));
+            this.pageTwoControl3.ltt = this.mainControl1.ltt;
+            pageTwoControl3.LoadData(new Vector3(0, 0, 1), new Vector3(0, 0, 0), mainControl1.lista, mainControl1.size);
+
+            
         }
     }
 }

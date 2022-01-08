@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,19 +15,37 @@ namespace CholeskyApp.Controls
 {
     public partial class MainControl : UserControl
     {
+        public LTTHelper ltt { get; set; }
+        public List<Luk> listaLukow { get; set; }
+
+        public List<Wezel> listaWezlow { get; set; }
+
+        public Dictionary<string, int> lista { get; set; }
+        public PopupForm popup { get; set; }
+
+        public PopupWezly popup2 { get; set; }
+        public GraphForm graph { get; set; }
+
+        public int size { get; set; }
+
         public MainControl()
         {
             InitializeComponent();
+            popup = new PopupForm();
+            popup2 = new PopupWezly();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var size = (int)this.matrixSizeNumericInput.Value;
+            
 
-            var ltt = new LTTHelper(size);
-
+            size = (int)this.matrixSizeNumericInput.Value;
+           
+            
+            ltt = new LTTHelper(size);
+            
             this.resultsList.Items.Add($"N: {size} Time: {ltt.GenerationTime} ns");
-
+            
             this.dataGridView1.Rows.Clear();
             ltt.ListaPomocnicza = ltt.ListaPomocnicza.OrderBy(x => x.W_I).ThenBy(y => y.W_J).ThenBy(z => z.W_K).ToList();
 
@@ -43,7 +62,7 @@ namespace CholeskyApp.Controls
 
 
 
-            var listaLukow = new List<Luk>();
+            listaLukow = new List<Luk>();
 
             var forCounter = 1;
             var lokId = 1;
@@ -236,25 +255,124 @@ namespace CholeskyApp.Controls
 
 
             var result = listaLukow.ToList();
-
-            PopupForm popup = new PopupForm();
+            
+            popup.Dispose();
+            popup = new PopupForm();
             popup.ListaLukow = listaLukow.ToList();
             popup.LoadData();
             popup.Show();
-
-            var listaWezlow = lista.Select(x =>
+            
+            listaWezlow = lista.Select(x =>
                 new Wezel
                 {
                     Id = x.Id,
                     Vector = $"{x.W_I} {x.W_J} {x.W_K}"
                 }
             ).ToList();
-
-            var popup2 = new PopupWezly();
+            
+            popup2.Dispose();
+            popup2 = new PopupWezly();
             popup2.ListaWezlow = listaWezlow;
             popup2.LoadData();
             popup2.Show();
+            
+            
+            graph = new GraphForm();
+            graph.Show();
+            
+        }
 
+
+        public void CreateTactNumber(Vector3 v1, Vector3 v2)
+        {
+            var wezlyPomocnicze = listaWezlow.ToList();
+            Dictionary<string, int> listaEP = new Dictionary<string, int>();
+            foreach(var item in ltt.ListaPomocnicza)
+            {
+                listaEP.Add(item.W_I+" "+item.W_J+" "+item.W_K, (int)((item.W_I*v1.X+ item.W_J * v1.Y + item.W_K * v1.Z)*10+(item.W_I * v2.X + item.W_J * v2.Y + item.W_K * v2.Z)));
+            }
+            lista = new Dictionary<string,int>();
+            var listaTymczasowa = new Dictionary<string, int>();
+            listaLukow.ToList();
+            int i = 1;
+            while (wezlyPomocnicze.Count!=0)
+            {
+                listaTymczasowa.Clear();
+                foreach(var item in listaWezlow)
+                {
+                    //sprawdz czy wezel jest na liscie wychodzacej
+                    if (lista.ContainsKey(item.Vector))
+                    {
+
+                    }
+                    else if (sprawdzWezel(item.Vector))// sprawdz czy wezel jest na liscie lukowo DO
+                    {
+                        var query = from p in listaLukow where p.Do.Equals(item.Vector) select p.Od;
+                        bool dodajDoListy = true;
+                        foreach (var items in query)
+                        {
+                            var querys = from p in lista where p.Key.Equals(items) select p.Value;
+                            querys.ToList();
+                            int a = querys.Count();
+                            if (querys.Count() == 0)
+                            {
+                                dodajDoListy=false;
+                            }
+                        }
+                        if (dodajDoListy)
+                        {
+                            //sprawdzenie czy w tym takcie nie wystepuje juz dzialanie z tego EP
+                            bool ep = true;
+                            foreach(var items in listaTymczasowa)
+                            {
+                                if(listaEP[items.Key] == listaEP[item.Vector])
+                                {
+                                    ep = false;
+                                }
+                            }
+                            if (ep)
+                            {
+                                listaTymczasowa.Add(item.Vector, i);
+                                wezlyPomocnicze.Remove(item);
+                            }
+                            
+                        }
+                    }
+                    else
+                    {
+                        bool ep = true;
+                        foreach (var items in listaTymczasowa)
+                        {
+                            if (listaEP[items.Key] == listaEP[item.Vector])
+                            {
+                                ep = false;
+                            }
+                        }
+                        if (ep)
+                        {
+                            listaTymczasowa.Add(item.Vector, i);
+                            wezlyPomocnicze.Remove(item);
+                        }
+                    }
+                }
+                foreach(var item in listaTymczasowa)
+                {
+                    lista.Add(item.Key, item.Value);
+                }
+                i++;
+            }
+        }
+
+        public Boolean sprawdzWezel(string item)
+        {
+            foreach(var item2 in listaLukow)
+            {
+                if (item2.Do.Equals(item))
+                {
+                    return true;//jest na liscie lukow do
+                }
+            }
+            return false;
         }
 
 
